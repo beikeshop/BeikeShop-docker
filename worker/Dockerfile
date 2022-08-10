@@ -1,12 +1,6 @@
 ARG PHP_VERSION
 FROM php:${PHP_VERSION}-alpine
 
-
-# ARG LARADOCK_PHP_VERSION
-# FROM php:${LARADOCK_PHP_VERSION}-alpine
-
-# ARG LARADOCK_PHP_VERSION
-
 # ARG CHANGE_SOURCE=false
 ARG CHANGE_SOURCE=true
 RUN if [ ${CHANGE_SOURCE} = true ]; then \
@@ -74,19 +68,6 @@ RUN if [ ${INSTALL_MEMCACHED} = true ]; then \
   docker-php-ext-enable memcached; \
   php -m | grep -r 'memcached'; \
   fi
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # Add a non-root user to help install ffmpeg:

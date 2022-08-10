@@ -1,4 +1,3 @@
-#FROM php:8.0-fpm
 ARG PHP_VERSION
 ARG BASE_IMAGE_TAG_PREFIX=latest
 # FROM laradock/php-fpm:${BASE_IMAGE_TAG_PREFIX}-8.0
@@ -28,65 +27,40 @@ RUN set -eux; \
             libssl-dev \
             libxml2-dev \
             libmcrypt-dev; \
-    rm -rf /var/lib/apt/lists/*
+     rm -rf /var/lib/apt/lists/*
 
-# RUN set -xe; \
-#     apt-get update -yqq && \
-#     pecl channel-update pecl.php.net && \
-#     apt-get install -yqq \
-#       apt-utils \
-#       gnupg2 \
-#       git \
-      #
-      #--------------------------------------------------------------------------
-      # Mandatory Software's Installation
-      #--------------------------------------------------------------------------
-      #
-      # Mandatory Software's such as ("mcrypt", "pdo_mysql", "libssl-dev", ....)
-      # are installed on the base image 'laradock/php-fpm' image. If you want
-      # to add more Software's or remove existing one, you need to edit the
-      # base image (https://github.com/Laradock/php-fpm).
-      #
-      # next lines are here becase there is no auto build on dockerhub see https://github.com/laradock/laradock/pull/1903#issuecomment-463142846
-      #libzip-dev zip unzip;
-            # libzip-dev zip unzip; && \
-      # if [ ${PHP_VERSION} = "7.3" ] || [ ${PHP_VERSION} = "7.4" ] || [ $(php -r "echo PHP_MAJOR_VERSION;") = "8" ]; then \
-      #   docker-php-ext-configure zip; \
-      # else \
-      #   docker-php-ext-configure zip --with-libzip; \
-      # fi && \
-      # # Install the zip extension
-      # docker-php-ext-install zip && \
-      # php -m | grep -q 'zip'
-
+RUN set -xe; \
+    apt-get update -yqq && \
+    pecl channel-update pecl.php.net && \
+    apt-get install -yqq \
+      apt-utils libzip-dev zip unzip && \
+      if [ ${PHP_VERSION} = "7.3" ] || [ ${PHP_VERSION} = "7.4" ] || [ $(php -r "echo PHP_MAJOR_VERSION;") = "8" ]; then \
+        docker-php-ext-configure zip; \
+      else \
+        docker-php-ext-configure zip --with-libzip; \
+      fi && \
+      docker-php-ext-install zip && \
+      php -m | grep -q 'zip'
 
 ###########################################################################
 # XMLRPC:
 ###########################################################################
 ARG INSTALL_XMLRPC=false
 RUN if [ ${INSTALL_XMLRPC} = true ]; then \
-  apt-get -y install libxml2-dev; \
   if [ $(php -r "echo PHP_MAJOR_VERSION;") = "8" ]; then \
-    docker-php-source extract; \
-    pecl install xmlrpc-1.0.0RC3; \
-    docker-php-ext-install xmlrpc; \
+  pecl install xmlrpc-1.0.0RC3; \
+  docker-php-ext-enable xmlrpc; \
   else \
-    docker-php-ext-install xmlrpc; \
-  fi \
-;fi
-
-# Install the pgsql extension
-ARG INSTALL_PGSQL=true
-RUN if [ ${INSTALL_PGSQL} = true ]; then \
-    docker-php-ext-install pgsql \
-;fi
+  docker-php-ext-install xmlrpc; \
+  fi; \
+  php -m | grep -r 'xmlrpc'; \
+  fi
 
 ###########################################################################
 # PHP REDIS EXTENSION
 ###########################################################################
 
 ARG INSTALL_PHPREDIS=true
-
 RUN if [ ${INSTALL_PHPREDIS} = true ]; then \
     # Install Php Redis Extension
     if [ $(php -r "echo PHP_MAJOR_VERSION;") = "5" ]; then \

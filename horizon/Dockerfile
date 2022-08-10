@@ -1,12 +1,6 @@
 ARG PHP_VERSION
 FROM php:${PHP_VERSION}-alpine
 
-
-# ARG LARADOCK_PHP_VERSION
-# FROM php:${LARADOCK_PHP_VERSION}-alpine
-
-# ARG LARADOCK_PHP_VERSION
-
 # ARG CHANGE_SOURCE=false
 ARG CHANGE_SOURCE=true
 RUN if [ ${CHANGE_SOURCE} = true ]; then \
@@ -40,12 +34,23 @@ RUN pecl channel-update pecl.php.net; \
 #RUN docker-php-ext-install mysqli mbstring pdo pdo_mysql tokenizer xml pcntl xmlrpc
 #RUN pecl channel-update pecl.php.net && pecl install memcached mcrypt-1.0.1 && docker-php-ext-enable memcached
 
+ARG INSTALL_XMLRPC=true
+RUN if [ ${INSTALL_XMLRPC} = true ]; then \
+  if [ $(php -r "echo PHP_MAJOR_VERSION;") = "8" ]; then \
+  pecl install xmlrpc-1.0.0RC3; \
+  docker-php-ext-enable xmlrpc; \
+  else \
+  docker-php-ext-install xmlrpc; \
+  fi; \
+  php -m | grep -r 'xmlrpc'; \
+  fi
+
+
 ###########################################################################
 # PHP Memcached:
 ###########################################################################
 
 ARG INSTALL_MEMCACHED=true
-
 RUN if [ ${INSTALL_MEMCACHED} = true ]; then \
   apk --update add libmemcached-dev; \
   # Install the php memcached extension
@@ -74,14 +79,6 @@ RUN if [ ${INSTALL_BZ2} = true ]; then \
   docker-php-ext-install bz2 \
 ;fi
 
-#Install BZ2:
-# RUN apk --update add bzip2-dev; \
-#   docker-php-ext-install bz2 && \
-
-  #Install GD package:
-  # apk add --update --no-cache freetype libpng libjpeg-turbo freetype-dev libpng-dev libjpeg-turbo-dev; \
-  # docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/; \
-  # docker-php-ext-install gd && \
 #Install GD package:
 ARG INSTALL_GD=true
 RUN if [ ${INSTALL_GD} = true ]; then \

@@ -28,9 +28,20 @@ ENV PUID ${PUID}
 ARG PGID=1000
 ENV PGID ${PGID}
 
+RUN apt-get install -y software-properties-common && \
+    add-apt-repository -y ppa:ondrej/php
+
 RUN groupadd -g ${PGID} workspace && \
     useradd -u ${PUID} -g workspace -m workspace -G docker_env && \
-    usermod -p "*" workspace -s /bin/bash
+    usermod -p "*" workspace -s /bin/bash 
+###########################################################################
+# Set Timezone
+###########################################################################
+
+ARG TZ=UTC
+ENV TZ ${TZ}
+
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # Add the "PHP 7" ppa
 #RUN apt-get install -y software-properties-common && \
@@ -40,45 +51,30 @@ RUN groupadd -g ${PGID} workspace && \
 RUN echo 'DPkg::options { "--force-confdef"; };' >> /etc/apt/apt.conf
 
 # Install "PHP Extentions", "libraries", "Software's"
-#RUN apt-get update && \
- #    apt-get upgrade -y && \
-#     apt-get install -y --allow-downgrades --allow-remove-essential \
- #        --allow-change-held-packages \
-#         php7.2-cli \
-#         php7.2-common \
-#         php7.2-curl \
-#         php7.2-intl \
-#         php7.2-json \
-#         php7.2-xml \
-#         php7.2-xmlrpc \
-#         php7.2-mbstring \
-#         php7.2-mysql \
-#         php7.2-pgsql \
-#         php7.2-sqlite \
-#         php7.2-sqlite3 \
-#         php7.2-zip \
-#         php7.2-bcmath \
-#         php7.2-memcached \
-#         php7.2-gd \
-#         php7.2-dev \
-    #      pkg-config \
-    #     libzip-dev \
-    #      zip \
-    #      unzip \
-    #      libcurl4-openssl-dev \
-    #      libedit-dev \
-    #      libssl-dev \
-    #      libxml2-dev \
-    #      libpng-dev \
-    #      xz-utils \
-    #      libsqlite3-dev \
-    #      sqlite3 \
-    #      git \
-    #      curl \
-    #      vim \
-    #      nano \
-    #      postgresql-client \
-    #  && apt-get clean
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install -y --allow-downgrades --allow-remove-essential \
+        --allow-change-held-packages \
+         php${PHP_VERSION}-cli \
+         php${PHP_VERSION}-common \
+         php${PHP_VERSION}-dev \
+         pkg-config \
+         libzip-dev \
+         zip \
+         unzip \
+         libcurl4-openssl-dev \
+         libedit-dev \
+         libssl-dev \
+         libxml2-dev \
+         libpng-dev \
+         xz-utils \
+         libsqlite3-dev \
+         sqlite3 \
+         curl \
+         vim \
+         nano \
+         postgresql-client \
+     && apt-get clean
 
 ###########################################################################
 # XMLRPC:
