@@ -479,9 +479,6 @@ services:
         - "dockerhost:${DOCKER_HOST_IP}"
       ports:
         - "${WORKSPACE_SSH_PORT}:22"
-        - "${WORKSPACE_BROWSERSYNC_HOST_PORT}:3000"
-        - "${WORKSPACE_BROWSERSYNC_UI_HOST_PORT}:3001"
-        - "${WORKSPACE_ANGULAR_CLI_SERVE_HOST_PORT}:4200"
       tty: true
       environment:
         - PHP_IDE_CONFIG=${PHP_IDE_CONFIG}
