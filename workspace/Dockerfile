@@ -707,7 +707,7 @@ USER laradock
 
 # Check if NVM needs to be installed
 ARG NODE_VERSION=node
-ENV NODE_VERSION ${NODE_VERSION}
+ENV NODE_VERSION 16
 ARG INSTALL_NODE=false
 ARG INSTALL_NPM_GULP=false
 ARG INSTALL_NPM_BOWER=false
@@ -732,9 +732,9 @@ RUN if [ ${INSTALL_NODE} = true ]; then \
     mkdir -p $NVM_DIR && \
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash \
         && . $NVM_DIR/nvm.sh \
-        && nvm install ${NODE_VERSION} \
-        && nvm use ${NODE_VERSION} \
-        && nvm alias ${NODE_VERSION} \
+        && nvm install 16 \
+        && nvm use 16 \
+        && nvm alias 16 \
         && npm config set fetch-retries ${NPM_FETCH_RETRIES} \
         && npm config set fetch-retry-factor ${NPM_FETCH_RETRY_FACTOR} \
         && npm config set fetch-retry-mintimeout ${NPM_FETCH_RETRY_MINTIMEOUT} \
